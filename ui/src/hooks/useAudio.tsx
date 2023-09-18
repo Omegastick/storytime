@@ -31,6 +31,9 @@ export const useAudio = (
   }, []);
 
   const handleAudioEnded = useCallback(async () => {
+    if (pauseTimeRef.current) {
+      return;
+    }
     if (onAudioEnded) {
       const nextBuffer = onAudioEnded();
       if (nextBuffer) {
