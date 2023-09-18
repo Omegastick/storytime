@@ -8,7 +8,9 @@ type UseAudioReturnType = {
   hasAudio: boolean;
 };
 
-export const useAudio = (): UseAudioReturnType => {
+export const useAudio = (
+  onAudioEnded?: () => Promise<ArrayBuffer>
+): UseAudioReturnType => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
@@ -28,11 +30,35 @@ export const useAudio = (): UseAudioReturnType => {
     };
   }, []);
 
-  const handleAudioEnded = useCallback(() => {
+  const handleAudioEnded = useCallback(async () => {
+    if (onAudioEnded) {
+      const nextBuffer = onAudioEnded();
+      if (nextBuffer) {
+        if (!audioContext) return;
+        const buffer = await audioContext.decodeAudioData(await nextBuffer);
+        if (!buffer) {
+          console.error("Failed to decode audio data");
+          return;
+        }
+        audioBufferRef.current = buffer;
+        const src = audioContext.createBufferSource();
+        src.buffer = buffer;
+        src.connect(audioContext.destination);
+        audioSourceRef.current = src;
+        src.addEventListener("ended", handleAudioEnded);
+
+        startTimeRef.current =
+          audioContext.currentTime - (pauseTimeRef.current || 0);
+        src.start(0, pauseTimeRef.current || 0);
+        setIsPlaying(true);
+        return;
+      }
+    }
+
     setIsPlaying(false);
     pauseTimeRef.current = 0;
     audioBufferRef.current = null;
-  }, []);
+  }, [audioContext, onAudioEnded]);
 
   const stopAudio = () => {
     if (!audioSourceRef.current) {
@@ -55,7 +81,7 @@ export const useAudio = (): UseAudioReturnType => {
     return src;
   };
 
-  const playAudio = async (audioBuffer: ArrayBuffer): Promise<void> => {
+  const playNewAudio = async (audioBuffer: ArrayBuffer): Promise<void> => {
     if (!audioContext) return;
 
     stopAudio();
@@ -72,6 +98,7 @@ export const useAudio = (): UseAudioReturnType => {
     startTimeRef.current =
       audioContext.currentTime - (pauseTimeRef.current || 0);
     src.start(0, pauseTimeRef.current || 0);
+    pauseTimeRef.current = 0;
     setIsPlaying(true);
   };
 
@@ -94,11 +121,12 @@ export const useAudio = (): UseAudioReturnType => {
 
     startTimeRef.current = audioContext.currentTime - pauseTimeRef.current;
     src.start(0, pauseTimeRef.current);
+    pauseTimeRef.current = 0;
     setIsPlaying(true);
   };
 
   return {
-    playNewAudio: playAudio,
+    playNewAudio,
     pauseAudio,
     resumeAudio,
     isPlaying,
