@@ -1,5 +1,5 @@
 import { Box, IconButton, Textarea } from "@chakra-ui/react";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { postToTTS } from "../api";
 import { useAudio } from "../hooks/useAudio";
@@ -8,12 +8,12 @@ import { useTextChunker } from "../hooks/useTextChunker";
 type TTSPageProps = {};
 
 const TTSPage: React.FC<TTSPageProps> = () => {
-  const currentChunk = useRef<number>(0);
+  const [currentChunk, setCurrentChunk] = useState<number>(0);
   const { setText, chunks } = useTextChunker();
 
   const onAudioEnded = useCallback(async () => {
-    currentChunk.current++;
-    const text = chunks.at(currentChunk.current);
+    setCurrentChunk((prevChunk) => prevChunk + 1);
+    const text = chunks.at(currentChunk + 1);
     if (!text) {
       throw new Error("No text to play");
     }
@@ -45,7 +45,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
 
     let audioBuffer: ArrayBuffer;
     try {
-      const text = chunks.at(currentChunk.current);
+      const text = chunks.at(currentChunk);
       if (!text) {
         console.error("No text to play");
         return;
