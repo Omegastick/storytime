@@ -1,10 +1,16 @@
+import { ChakraProvider } from '@chakra-ui/react';
 import React from 'react';
-import MyComponent from './MyComponent';
+import Layout from './components/Layout';
+import TTSPage from './components/TTSPage';
 
 const App: React.FC = () => {
   return (
     <div>
-      <MyComponent />
+      <ChakraProvider>
+        <Layout>
+          <TTSPage />
+        </Layout>
+      </ChakraProvider>
     </div>
   );
 };
