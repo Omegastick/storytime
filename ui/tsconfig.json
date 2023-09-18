@@ -1,12 +1,11 @@
 {
-    "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "jsx": "react",
-      "strict": true,
-      "esModuleInterop": true
-    },
-    "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
-  }
-  
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "jsx": "react",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
