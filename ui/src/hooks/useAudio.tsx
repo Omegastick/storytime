@@ -4,6 +4,7 @@ type UseAudioReturnType = {
   playNewAudio: (audioBuffer: ArrayBuffer) => Promise<void>;
   pauseAudio: () => void;
   resumeAudio: () => void;
+  stopAudio: () => void;
   isPlaying: boolean;
   hasAudio: boolean;
 };
@@ -63,7 +64,7 @@ export const useAudio = (
     audioBufferRef.current = null;
   }, [audioContext, onAudioEnded]);
 
-  const stopAudio = () => {
+  const stopAudio = (pause: boolean = false) => {
     if (!audioSourceRef.current) {
       return;
     }
@@ -71,6 +72,16 @@ export const useAudio = (
     audioSourceRef.current.removeEventListener("ended", handleAudioEnded);
     audioSourceRef.current.stop();
     audioSourceRef.current = null;
+    setIsPlaying(false);
+
+    if (pause) {
+      pauseTimeRef.current = audioContext
+        ? audioContext.currentTime - startTimeRef.current
+        : 0;
+    } else {
+      pauseTimeRef.current = 0;
+      audioBufferRef.current = null;
+    }
   };
 
   const setupAudioSource = (buffer: AudioBuffer) => {
@@ -108,9 +119,7 @@ export const useAudio = (
   const pauseAudio = () => {
     if (!audioContext) return;
 
-    pauseTimeRef.current = audioContext.currentTime - startTimeRef.current;
-    stopAudio();
-    setIsPlaying(false);
+    stopAudio(true);
   };
 
   const resumeAudio = () => {
@@ -132,6 +141,7 @@ export const useAudio = (
     playNewAudio,
     pauseAudio,
     resumeAudio,
+    stopAudio,
     isPlaying,
     hasAudio: !!audioBufferRef.current,
   };

@@ -9,22 +9,25 @@ type TTSPageProps = {};
 
 const TTSPage: React.FC<TTSPageProps> = () => {
   const { setText, chunks } = useTextChunker();
-  const { nextAudioBuffer } = useAudioBufferQueue(chunks);
+  const { nextAudioBuffer, clearQueue } = useAudioBufferQueue(chunks);
 
   const onAudioEnded = useCallback(async () => {
     return nextAudioBuffer();
   }, [nextAudioBuffer]);
 
   const {
-    playNewAudio: playAudio,
+    playNewAudio,
     resumeAudio,
     pauseAudio,
+    stopAudio,
     isPlaying,
     hasAudio,
   } = useAudio(onAudioEnded);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
+    stopAudio();
+    clearQueue();
   };
 
   const handlePlayClick = async () => {
@@ -37,7 +40,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
       return;
     }
 
-    await playAudio(await nextAudioBuffer());
+    await playNewAudio(await nextAudioBuffer());
   };
 
   return (

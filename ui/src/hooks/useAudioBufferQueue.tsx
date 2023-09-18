@@ -60,6 +60,7 @@ export const useAudioBufferQueue = (
 
   const clearQueue = useCallback(() => {
     queueRef.current = [];
+    currentChunkIndexRef.current = 0;
   }, []);
 
   return {

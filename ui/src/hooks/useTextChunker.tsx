@@ -41,7 +41,7 @@ export const useTextChunker = (): UseTextChunkerReturnType => {
   const [chunks, setChunks] = useState<string[]>([]);
 
   const handleTextChange = (text: string) => {
-    setChunks(chunkText(text, 3));
+    setChunks(chunkText(text, 2));
   };
 
   return {
