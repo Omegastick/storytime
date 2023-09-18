@@ -43,6 +43,6 @@ class XTTSModel(TTSModel):
 
         buffer = BytesIO()
         with buffer as f:
-            soundfile.write(f, outputs["wav"], samplerate=22050, format="wav", subtype="PCM_16")
+            soundfile.write(f, outputs["wav"], samplerate=24000, format="wav", subtype="PCM_16")
             f.seek(0)
             return buffer.getvalue()
