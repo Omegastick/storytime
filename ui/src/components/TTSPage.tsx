@@ -1,24 +1,19 @@
 import { Box, IconButton, Textarea } from "@chakra-ui/react";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
-import { postToTTS } from "../api";
 import { useAudio } from "../hooks/useAudio";
+import { useAudioBufferQueue } from "../hooks/useAudioBufferQueue";
 import { useTextChunker } from "../hooks/useTextChunker";
 
 type TTSPageProps = {};
 
 const TTSPage: React.FC<TTSPageProps> = () => {
-  const currentChunkRef = useRef<number>(0);
   const { setText, chunks } = useTextChunker();
+  const { nextAudioBuffer } = useAudioBufferQueue(chunks);
 
   const onAudioEnded = useCallback(async () => {
-    const text = chunks.at(currentChunkRef.current++);
-    if (!text) {
-      throw new Error("No text to play");
-    }
-    let audioBuffer = await postToTTS(text);
-    return audioBuffer;
-  }, [chunks, currentChunkRef]);
+    return nextAudioBuffer();
+  }, [nextAudioBuffer]);
 
   const {
     playNewAudio: playAudio,
@@ -42,20 +37,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
       return;
     }
 
-    let audioBuffer: ArrayBuffer;
-    try {
-      const text = chunks.at(currentChunkRef.current++);
-      if (!text) {
-        console.error("No text to play");
-        return;
-      }
-      audioBuffer = await postToTTS(text);
-    } catch (error) {
-      console.error("Failed to post to TTS:", error);
-      return;
-    }
-
-    await playAudio(audioBuffer);
+    await playAudio(await nextAudioBuffer());
   };
 
   return (

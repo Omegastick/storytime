@@ -33,11 +33,13 @@ class XTTSModel(TTSModel):
         if self.model is None:
             self.model = self._load_model()
 
+        logger.info(f"Generating audio for text: {text}")
+
         outputs = self.model.synthesize(
             text,
             self.config,
             speaker_wav=self.voices_dir / f"{kwargs.get('voice', 'peter-dann-1')}.wav",
-            gpt_cond_len=kwargs.get("gpt_cond_len", 5),
+            gpt_cond_len=kwargs.get("gpt_cond_len", 3),
             language=kwargs.get("language", "en"),
         )
 
