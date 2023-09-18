@@ -9,12 +9,13 @@ from TTS.tts.models.xtts import Xtts
 
 FAKE_CONFIG_PATH = Path("/fake/config/path")
 FAKE_CHECKPOINT_DIR = Path("/fake/checkpoint/dir")
+FAKE_VOICES_DIR = Path("/fake/voices/dir")
 
 
 @pytest.fixture()
 def xtts_model() -> XTTSModel:
     with patch("app.tts.xtts.XttsConfig", autospec=True):
-        return XTTSModel(FAKE_CONFIG_PATH, FAKE_CHECKPOINT_DIR)
+        return XTTSModel(FAKE_CONFIG_PATH, FAKE_CHECKPOINT_DIR, FAKE_VOICES_DIR)
 
 
 @pytest.fixture()
@@ -56,7 +57,7 @@ def test_generate_audio_passes_kwargs_to_synthesize(
     mock_xtts.init_from_config.return_value.synthesize.assert_called_once_with(
         "test",
         xtts_model.config,
-        speaker_wav="fake_voice",
+        speaker_wav=FAKE_VOICES_DIR / "fake_voice.wav",
         gpt_cond_len=5,
         language="en",
     )
