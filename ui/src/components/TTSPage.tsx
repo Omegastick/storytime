@@ -1,13 +1,13 @@
 import { Box, IconButton, Textarea } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { postToTTS } from "../api";
 import { useAudio } from "../hooks/useAudio";
+import { useTextChunker } from "../hooks/useTextChunker";
 
 type TTSPageProps = {};
 
 const TTSPage: React.FC<TTSPageProps> = () => {
-  const [text, setText] = useState<string>("");
   const {
     playNewAudio: playAudio,
     resumeAudio,
@@ -15,6 +15,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
     isPlaying,
     hasAudio,
   } = useAudio();
+  const { setText, chunks } = useTextChunker();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -32,6 +33,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
 
     let audioBuffer: ArrayBuffer;
     try {
+      const text = chunks.join("");
       audioBuffer = await postToTTS(text);
     } catch (error) {
       console.error("Failed to post to TTS:", error);
@@ -46,7 +48,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
       <Textarea
         flexGrow={1}
         placeholder="Write something..."
-        value={text}
+        value={chunks.join("")}
         onChange={handleTextChange}
       />
       <IconButton
