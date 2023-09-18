@@ -12,12 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class XTTSModel(TTSModel):
-    def __init__(self, config_path: Path, checkpoint_dir: Path):
+    def __init__(self, config_path: Path, checkpoint_dir: Path, voices_dir: Path):
         self.config = XttsConfig()
         logger.info(f"Loading XTTS config from {config_path}")
         self.config.load_json(config_path)
 
         self.checkpoint_dir = checkpoint_dir
+        self.voices_dir = voices_dir
 
         self.model: Xtts | None = None
 
@@ -35,7 +36,7 @@ class XTTSModel(TTSModel):
         outputs = self.model.synthesize(
             text,
             self.config,
-            speaker_wav=kwargs.get("voice", "/home/omega/voices/peter-dann-1.wav"),
+            speaker_wav=self.voices_dir / f"{kwargs.get('voice', 'peter-dann-1')}.wav",
             gpt_cond_len=kwargs.get("gpt_cond_len", 5),
             language=kwargs.get("language", "en"),
         )
