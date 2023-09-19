@@ -5,6 +5,7 @@ import useLocalStorage from "use-local-storage";
 import { useAudio } from "../hooks/useAudio";
 import { useAudioBufferQueue } from "../hooks/useAudioBufferQueue";
 import { useTextChunker } from "../hooks/useTextChunker";
+import UploadEpubButton from "./UploadEpubButton";
 
 type TTSPageProps = {};
 
@@ -48,6 +49,7 @@ const TTSPage: React.FC<TTSPageProps> = () => {
   return (
     <Box display="flex" flexDirection="column" height="100%">
       <Input value={apiUrl} onChange={(e) => setApiUrl(e.target.value)} />
+      <UploadEpubButton onTextExtracted={setText} />
       <Textarea
         flexGrow={1}
         placeholder="Write something..."
