@@ -29,7 +29,7 @@ class XTTSModel(TTSModel):
         model.cuda()
         return model
 
-    def generate_audio(self, text: str, **kwargs) -> bytes:
+    async def generate_audio(self, text: str, **kwargs) -> bytes:
         if self.model is None:
             self.model = self._load_model()
 

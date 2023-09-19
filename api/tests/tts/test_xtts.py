@@ -26,11 +26,12 @@ def mock_xtts() -> Generator[Mock, None, None]:
         yield mock_xtts
 
 
-def test_generate_audio_loads_model(
+@pytest.mark.asyncio
+async def test_generate_audio_loads_model(
     mock_xtts: Mock,
     xtts_model: XTTSModel,
 ):
-    xtts_model.generate_audio("test")
+    await xtts_model.generate_audio("test")
 
     mock_xtts.init_from_config.assert_called_once_with(xtts_model.config)
     mock_xtts.init_from_config.return_value.load_checkpoint.assert_called_once_with(
@@ -39,20 +40,22 @@ def test_generate_audio_loads_model(
     mock_xtts.init_from_config.return_value.cuda.assert_called_once_with()
 
 
-def test_generate_audio_generates_audio(
+@pytest.mark.asyncio
+async def test_generate_audio_generates_audio(
     mock_xtts: Mock,
     xtts_model: XTTSModel,
 ):
-    audio = xtts_model.generate_audio("test")
+    audio = await xtts_model.generate_audio("test")
 
     assert audio.startswith(b"RIFF")
 
 
-def test_generate_audio_passes_kwargs_to_synthesize(
+@pytest.mark.asyncio
+async def test_generate_audio_passes_kwargs_to_synthesize(
     mock_xtts: Mock,
     xtts_model: XTTSModel,
 ):
-    xtts_model.generate_audio("test", voice="fake_voice", gpt_cond_len=5, language="en")
+    await xtts_model.generate_audio("test", voice="fake_voice", gpt_cond_len=5, language="en")
 
     mock_xtts.init_from_config.return_value.synthesize.assert_called_once_with(
         "test",

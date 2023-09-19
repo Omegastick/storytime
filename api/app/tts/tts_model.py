@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class TTSModel(ABC):
     @abstractmethod
-    def generate_audio(self, text: str, **kwargs) -> bytes:
+    async def generate_audio(self, text: str, **kwargs) -> bytes:
         """
         Generate audio from text.
 
